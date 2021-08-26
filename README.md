@@ -1,4 +1,4 @@
-#Taco-Registry App Project
+#Spring Boot Angular App Sample Project
 
 ##1. Language Setting
 ### postgresql
