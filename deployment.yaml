@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello1
+  labels:
+    appname: hello1
+spec:
+  selector:
+    matchLabels:
+      appname: hello1
+  replicas: 2
+  template:
+    metadata:
+      name: hello1
+      labels:
+        appname: hello1
+    spec:
+      imagePullSecrets:
+        - name: myregistrykey
+      containers:
+        - name: hello1
+          image: boozer83/hello1:0.0.3
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "8080"
+          ports:
+            - name: port1
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 102Mi
+            limits:
+              cpu: 100m
+              memory: 204Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-hello1
+spec:
+  type: NodePort
+  selector:
+    appname: hello1
+  ports:
+    - name: port-hello1
+      port: 8090
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ing-hello1
+spec:
+  rules:
+    - host: "sample.com"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: svc-hello1
+                port:
+                  number: 8090
